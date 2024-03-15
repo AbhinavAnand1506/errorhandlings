@@ -9,38 +9,34 @@ Once you are on the Remix website, create a new file by clicking on the "+" icon
 ##sourcecode
 
        
-       pragma solidity 0.8.22;
-       contract Errorhandling {
-      function testRequire(uint _i) public pure {
-        // Require should be used to validate conditions such as:
-        // - inputs
-        // - conditions before execution
-        // - return values from calls to other functions
-        require(_i > 25, "Input must be greater than 25");
-        //if this condition will satisfy then rest of the function will work
-        // otherwise it should back the message.
+     pragma solidity ^0.8.0;
+    contract VotingSystem{
+    mapping(address => bool) public hasVoted;
+    uint public yesVotes;
+    uint public noVotes;
+    event Voted(address indexed voter, bool vote);
+    function vote(bool inSupport) external {
+        require(!hasVoted[msg.sender], "You have already voted");
+     
+        if(inSupport){
+            yesVotes++;
+        }else{
+            noVotes++;
+        }
+        hasVoted[msg.sender]= true;
+        emit Voted(msg.sender, inSupport);
     }
-
-    function testRevert(uint _i) public pure {
-        // Revert is useful when the condition to check is complex.
-        // This code does the exact same thing as the example above
-        if (_i <= 25) {
-            revert("Input must be greater than 25");
+    function getResult() external view returns(string memory) {
+        if(yesVotes > noVotes){
+            return "Proposal accepted";
+        }
+        else if(noVotes > yesVotes){
+            return "Proposal rejected";
+        }else{
+            return "Proposal tied";
         }
     }
-
-    uint public num;
-
-    function testAssert() public view {
-        // Assert should only be used to test for internal errors,
-        // and to check invariants.
-
-        // Here we assert that num is always equal to 0
-        // since it is impossible to update the value of num
-        assert(num == 0);
     }
-    }
-
 
 
 To compile the code, click on the "Solidity Compiler" tab in the left-hand sidebar. Make sure the "Compiler" option is set to "0.8.22" (or another compatible version).
